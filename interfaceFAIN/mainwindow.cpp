@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->widget->setVisible(false);
-    ui->widget->setVisible(false);
+    ui->widget_2->setVisible(false);
     m_render = new RenderImg(this);
     ui->horizontalLayout->insertWidget(0,m_render,99);
     m_render->setFocusPolicy(Qt::ClickFocus);
@@ -153,4 +153,16 @@ void MainWindow::on_pushButton_6_clicked()
 {
     //Erode black
     m_render->analysis_erodeBlack();
+}
+
+void MainWindow::on_pushButton_7_clicked()
+{
+    //Dilate black
+    m_render->analysis_dilateBlack();
+}
+
+void MainWindow::on_checkBox_toggled(bool checked)
+{
+    //Use con8
+    m_render->setCon8(checked);
 }

@@ -27,6 +27,7 @@ public:
     //Project//
 
     void project_erode_black(Image2Grey& img_out, bool con8=false) const; //requires binary img
+    void project_dilate_black(Image2Grey& img_out, bool con8=false) const;
 };
 
 #endif // IMAGE2GREY_H

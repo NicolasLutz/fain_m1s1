@@ -13,10 +13,9 @@ RenderImg::RenderImg(QWidget *parent):
     m_imageType(RGBA_I),
     m_polygonMode(false),
     m_GS(),
-    m_seuil(128)
-  // QQ INIT A AJOUTER ?
+    m_seuil(128),
+    m_useCon8(false)
 {
-    // VOTRE CODE ICI
     m_colorPicker=new QColorDialog(QColor(255,255,255), this);
     m_colorImg.changeColor(Color(1,1,1));
 
@@ -37,7 +36,6 @@ RenderImg::RenderImg(QWidget *parent):
     m_actionColorImg=m_menu->addAction("Switch to Color image");
     m_actionGreyImg=m_menu->addAction("Switch to Grey image");
     m_actionBinaryImg=m_menu->addAction("Switch to Binary image");
-    //m_brsh_circle
 
     ///Actions
     this->connect(  m_colorPick, SIGNAL(triggered()),
@@ -83,6 +81,8 @@ void RenderImg::save(const std::string& filename) const
 void RenderImg::clear()
 {
     m_colorImg.clear();
+
+    updateDataTexture();
 }
 
 //Updates//
@@ -223,15 +223,6 @@ void RenderImg::mousePressEvent(QMouseEvent *event)
     if(m_polygonMode)
         polygon_add();
 
-    std::cout << "PRESS in texture "<< x << " / " << y << std::endl;
-
-    if (m_state_modifier & Qt::ShiftModifier)
-    {
-        std::cout << "     with Shift" << std::endl;
-    }
-    if (m_state_modifier & Qt::ControlModifier)
-        std::cout << "     with Ctrl" << std::endl;
-
     updateDataTexture();
 }
 
@@ -244,19 +235,12 @@ void RenderImg::mouseReleaseEvent(QMouseEvent *event)
     m_lastReleasedPos.setX(x);
     m_lastReleasedPos.setY(y);
 
-    std::cout << " RELEASE in texture "<< x << " / " << y << std::endl;
-
     updateDataTexture();
 }
 
 void RenderImg::keyPressEvent(QKeyEvent* event)
 {
     m_state_modifier = event->modifiers();
-
-    if (event->key() == 'A')	// here 'A' check 'a' pressed (thanks to Qt!)
-    {
-        std::cout << " touche a enfoncee" << std::endl;
-    }
 }
 
 void RenderImg::keyReleaseEvent(QKeyEvent* event)
@@ -432,7 +416,7 @@ void RenderImg::analysis_toggled(bool arg1)
 int RenderImg::analysis_showCon()
 {
     m_greyImg.clear();
-    int lvl=m_colorImg.project_showCon(m_greyImg, false, 5);
+    int lvl=m_colorImg.project_showCon(m_greyImg, m_useCon8, 5);
 
     m_imageType=CONNEX_I;
 
@@ -452,10 +436,36 @@ void RenderImg::analysis_explicitShapes()
 
 void RenderImg::analysis_erodeBlack()
 {
-    m_colorImg.project_toBinary(m_greyImg, m_seuil);
+    if(m_imageType!=ERODE_I)
+        m_colorImg.project_toBinary(m_greyImg, m_seuil);
     m_erodeImg.resize(m_greyImg.getWidth(), m_greyImg.getHeight());
 
-    m_greyImg.project_erode_black(m_erodeImg);
+    if(m_imageType!=ERODE_I)
+        m_greyImg.project_erode_black(m_erodeImg, m_useCon8);
+    else
+    {
+        Image2Grey newErode(m_erodeImg);
+        newErode.project_erode_black(m_erodeImg, m_useCon8);
+    }
+
+    m_imageType=ERODE_I;
+
+    updateDataTexture();
+}
+
+void RenderImg::analysis_dilateBlack()
+{
+    if(m_imageType!=ERODE_I)
+        m_colorImg.project_toBinary(m_greyImg, m_seuil);
+    m_erodeImg.resize(m_greyImg.getWidth(), m_greyImg.getHeight());
+
+    if(m_imageType!=ERODE_I)
+        m_greyImg.project_dilate_black(m_erodeImg, m_useCon8);
+    else
+    {
+        Image2Grey newErode(m_erodeImg);
+        newErode.project_dilate_black(m_erodeImg, m_useCon8);
+    }
 
     m_imageType=ERODE_I;
 
@@ -467,4 +477,11 @@ void RenderImg::analysis_seuilChanged(unsigned char seuil)
     m_seuil=seuil;
     if(m_imageType==BIT_I)
         updateDataTexture();
+}
+
+//Autre//
+
+void RenderImg::setCon8(bool checked)
+{
+    m_useCon8=checked;
 }

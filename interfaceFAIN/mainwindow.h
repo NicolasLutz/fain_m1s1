@@ -55,6 +55,10 @@ private slots:
 
     void on_pushButton_6_clicked();
 
+    void on_pushButton_7_clicked();
+
+    void on_checkBox_toggled(bool checked);
+
 private:
     Ui::MainWindow *ui;
     RenderImg *m_render;

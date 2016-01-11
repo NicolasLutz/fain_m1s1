@@ -108,6 +108,7 @@ protected:
     GradientSobel m_GS;
 
     unsigned char m_seuil;
+    bool m_useCon8;
 
 public slots:
     void showContextMenu(const QPoint& pos);
@@ -137,7 +138,12 @@ public slots:
     int analysis_showCon();
     void analysis_explicitShapes();
     void analysis_erodeBlack();
+    void analysis_dilateBlack();
     void analysis_seuilChanged(unsigned char seuil);
+
+    //Autre//
+
+    void setCon8(bool checked);
 };
 
 #endif // RENDERIMG_H

@@ -27,9 +27,9 @@ const int GradientSobel::SobelErode4[9]={0,1,0,
                                           1,1,1,
                                            0,1,0};
 
-const int GradientSobel::SobelErode8[9]={0,1,0,
+const int GradientSobel::SobelErode8[9]={1,1,1,
                                          1,1,1,
-                                         0,1,0};
+                                         1,1,1};
 
 //====================================================================================================================================
 //Constructeurs

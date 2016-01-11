@@ -256,6 +256,8 @@ void Image2<T>::setPixel(const T& pixel, const Vec2i& pos)
 template<typename T>
 void Image2<T>::resize(size_t width, size_t height)
 {
+    if(m_width==width || m_height==height)
+        return;
     if(m_tab!=NULL)
         delete m_tab;
     m_width=width;

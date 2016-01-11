@@ -99,9 +99,9 @@ void Image2Grey::project_erode_black(Image2Grey& img_out, bool con8) const
             {
                 int k=kx+(3*ky);
                 if(con8)
-                    color=getPixel((unsigned int)x, (unsigned int)y)*GradientSobel::SobelErode4[k];
-                else
                     color=getPixel((unsigned int)x, (unsigned int)y)*GradientSobel::SobelErode8[k];
+                else
+                    color=getPixel((unsigned int)x, (unsigned int)y)*GradientSobel::SobelErode4[k];
                 if(color!=0)
                 {
                     (*it_out)=255;
@@ -110,8 +110,46 @@ void Image2Grey::project_erode_black(Image2Grey& img_out, bool con8) const
                 else
                     ++ky;
             }
+            ++kx;
+            ky=0;
         }
-        ++kx;
+        if(!stop)
+            (*it_out)=0;
+    }
+}
+
+void Image2Grey::project_dilate_black(Image2Grey& img_out, bool con8) const
+{
+    //make sure img and img out have the same size
+    const_iterator itEnd=end();
+    iterator it_out=img_out.begin();
+    for(const_iterator it=begin(); it!=itEnd; ++it, ++it_out)
+    {
+        unsigned char color;
+        int kx=0, ky=0;
+        bool stop=false;
+        for(int x=it.Vertice().X()-1; !stop && x<=it.Vertice().X()+1; ++x)
+        {
+            for(int y=it.Vertice().Y()-1; !stop && y<=it.Vertice().Y()+1; ++y)
+            {
+                int k=kx+(3*ky);
+                if(con8)
+                    color=getPixel((unsigned int)x, (unsigned int)y)*GradientSobel::SobelErode8[k];
+                else
+                    color=getPixel((unsigned int)x, (unsigned int)y)*GradientSobel::SobelErode4[k];
+                if(color==0 && (con8 || GradientSobel::SobelErode4[k]!=0))
+                {
+                    (*it_out)=0;
+                    stop=true;
+                }
+                else
+                    ++ky;
+            }
+            ky=0;
+            ++kx;
+        }
+        if(!stop)
+            (*it_out)=255;
     }
 }
 
